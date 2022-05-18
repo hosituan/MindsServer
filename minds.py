@@ -133,8 +133,10 @@ def check_key_exist(test_dict, key):
 
 def start():
     delayTime = maxDelay
+    commentedCount = 0
     while True:
         if delayTime == 0:
+            print("Commented: " + str(commentedCount))
             delayTime = maxDelay
         else:
             delayTime -= 1
@@ -153,7 +155,7 @@ def start():
             accessToken = token[user]
             print(user)
             visible, entitiID = checkVisible(postID)
-            if visible:
+            if visible and isinstance(entitiID, str):
                 print("Post " + postID + " visible")
                 viewPost(postID, accessToken)
                 (commentID, commentText) = getComment(postID, comments)
@@ -161,6 +163,7 @@ def start():
                     print("Commenting " + commentText + " from " + user + " to " + postID)
                     writeCommentedData(commentID)
                     comment(entitiID, commentText, accessToken)
+                    commentedCount += 1
                 else:
                     print("This comment has commented")
             else:
