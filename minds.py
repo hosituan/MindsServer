@@ -55,12 +55,22 @@ def getComment(postId, comments):
         response = requests.get(requestUrl)
         cmts = response.json()['payload']['comments']
         if len(cmts) == 0:
-            return "", "Are you serious?"
+            print("9GAG post has no comment")
+            return "", ""
         value = randint(0, len(cmts) - 1)
         data = cmts[value]
         text = data['mediaText']
         if text == "":
-            return "", "Are you serious?"
+            value = randint(0, len(cmts) - 1)
+            data = cmts[value]
+            text = data['mediaText']
+        if text == "":
+            value = randint(0, len(cmts) - 1)
+            data = cmts[value]
+            text = data['mediaText']
+        if text == "":
+            print("9GAG comment has no text comment")
+            return "", ""
         return data['commentId'], text
     if "gab" in url:
         print("This is Gab post")
