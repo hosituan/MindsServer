@@ -41,7 +41,11 @@ def checkVisible(postId):
     jsonResponse = response.json()
     if len(jsonResponse['entities']) > 0:
         entitiId = jsonResponse['entities'][0]['entity_guid']
-        return True, entitiId
+        if isinstance(entitiId, str):
+            return True, entitiId
+        else:
+            return True, jsonResponse['entities'][0]['guid']
+        
     else:
         return False, ""
 def getComment(postId, comments):
