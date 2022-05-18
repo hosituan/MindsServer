@@ -47,25 +47,24 @@ def checkVisible(postId):
 def getComment(postId, comments):
     url = comments[postId]
     if "9gag" in url:
-        print("9gag post")
+        print("This is 9gag post")
         prefix = "https://comment-cdn.9gag.com/v2/cacheable/comment-list.json?appId=a_dd8f2b7d304a10edaf6f29517ea0ca4100a43d1b&count=10&url="
         urlSurFix = url.replace("/", "%2F").replace("s:", "%3A")
         requestUrl = prefix + urlSurFix
         print("Comment resoure API: " + requestUrl)
         response = requests.get(requestUrl)
         cmts = response.json()['payload']['comments']
-        value = randint(0, len(cmts))
         if len(cmts) == 0:
-            return "firstCommented", "Are you serious?"
-        
+            return "", "Are you serious?"
+        value = randint(0, len(cmts) - 1)
         data = cmts[value]
         text = data['mediaText']
         if text == "":
-            return "firstCommented", "Are you serious?"
+            return "", "Are you serious?"
         return data['commentId'], text
     if "gab" in url:
-        print("Gab post")
-        return "firstCommented", "hahah"
+        print("This is Gab post")
+        return "", ""
         pre = "https://gab.com/api/v1/comments/"
         sur = "?sort_by=most-liked"
         gabPostArray = url.split("/")
@@ -78,10 +77,8 @@ def getComment(postId, comments):
 
     
 def writeCommentedData(id):
-    commented_ref.update( {
-        id: True
-    })
-    print("setted Commented")
+    commented_ref.child(id).set(True)
+    print("setted Commented " + id)
 def viewPost(postID, accessToken):
     url = "https://www.minds.com/api/v2/analytics/views/activity/" + postID
     pvUrl = "https://www.minds.com/api/v2/mwa/pv"
@@ -122,8 +119,10 @@ def comment(postId, text, accessToken):
     }
     headers = {"Authorization": "Bearer " + accessToken}
     response = requests.post(url, data=params, headers= headers)
-    print("Comment " + text + " " + postId + " " + response.json()['status'])
-
+    if check_key_exist(response.json(), 'status'):
+        print("Commented " + text + " to " + postId + " " + response.json()['status'])
+    else:
+        print(response.json())
 def check_key_exist(test_dict, key):
     try:
        test_dict[key]
@@ -140,7 +139,7 @@ def start():
         else:
             delayTime -= 1
         mins, secs = divmod(delayTime, 60)
-        timer = 'Restart in: {:02d}:{:02d}'.format(mins, secs)
+        timer = '<Commented: ' + str(commentedCount) +  '> Restart in: {:02d}:{:02d}'.format(mins, secs)
         print(timer, end="\r")
 
         if delayTime == maxDelay: 
@@ -152,18 +151,23 @@ def start():
             postID = random.choice(list(comments))
             user = random.choice(list(token))
             accessToken = token[user]
-            print(user)
+            print('Using ' + user)
             visible, entitiID = checkVisible(postID)
             if visible and isinstance(entitiID, str):
                 print("Post " + postID + " visible")
                 viewPost(postID, accessToken)
                 (commentID, commentText) = getComment(postID, comments)
                 if check_key_exist(commented, commentID) == False:
-                    print("Commenting " + commentText + " from " + user + " to " + postID)
-                    writeCommentedData(commentID)
-                    comment(entitiID, commentText, accessToken)
+                    print("Commented Data: " + str(len(commented.keys())))
+                    if commentID != "":
+                        print("Commenting " + commentText + " from " + user + " to " + postID)
+                        writeCommentedData(commentID)
+                        comment(entitiID, commentText, accessToken)
+                        commentedCount += 1
+                    else:
+                        print("CommentID is empty")
                 else:
-                    print("This comment has commented")
+                    print("This comment has commented " + commentID + " ----")
             else:
                 print(postID + " not visible")
         time.sleep(1)
