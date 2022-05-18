@@ -78,7 +78,7 @@ def getComment(postId, comments):
     
 def writeCommentedData(id):
     commented_ref.child(id).set(True)
-    print("setted Commented " + id)
+    print("UPDATED Commented " + id)
 def viewPost(postID, accessToken):
     url = "https://www.minds.com/api/v2/analytics/views/activity/" + postID
     pvUrl = "https://www.minds.com/api/v2/mwa/pv"
@@ -120,7 +120,7 @@ def comment(postId, text, accessToken):
     headers = {"Authorization": "Bearer " + accessToken}
     response = requests.post(url, data=params, headers= headers)
     if check_key_exist(response.json(), 'status'):
-        print("Commented " + text + " to " + postId + " " + response.json()['status'])
+        print("SUCCESS *** Commented " + text + " to " + postId + " " + response.json()['status'])
     else:
         print(response.json())
 def check_key_exist(test_dict, key):
@@ -139,7 +139,7 @@ def start():
         else:
             delayTime -= 1
         mins, secs = divmod(delayTime, 60)
-        timer = '<Commented: ' + str(commentedCount) +  '> Restart in: {:02d}:{:02d}'.format(mins, secs)
+        timer = '<COMMENTTED: ' + str(commentedCount) +  '> Restart in: {:02d}:{:02d}'.format(mins, secs)
         print(timer, end="\r")
 
         if delayTime == maxDelay: 
@@ -158,18 +158,18 @@ def start():
                 viewPost(postID, accessToken)
                 (commentID, commentText) = getComment(postID, comments)
                 if check_key_exist(commented, commentID) == False:
-                    print("Commented Data: " + str(len(commented.keys())))
+                    print("DATA *** Commented Data: " + str(len(commented.keys())))
                     if commentID != "":
                         print("Commenting " + commentText + " from " + user + " to " + postID)
                         writeCommentedData(commentID)
                         comment(entitiID, commentText, accessToken)
                         commentedCount += 1
                     else:
-                        print("CommentID is empty")
+                        print("ERROR *** CommentID is empty")
                 else:
-                    print("This comment has commented " + commentID + " ----")
+                    print("ERROR *** This comment has commented " + commentID + " ----")
             else:
-                print(postID + " not visible")
+                print("ERROR *** " + postID + " not visible")
         time.sleep(1)
         
 start()
