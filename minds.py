@@ -78,7 +78,7 @@ def getComment(postId, comments):
 
     
 def writeCommentedData(id):
-    commented_ref.set({
+    commented_ref.update( {
         id: True
     })
     print("setted Commented")
@@ -140,7 +140,7 @@ def start():
         else:
             delayTime -= 1
         mins, secs = divmod(delayTime, 60)
-        timer = 'Restart in: {:02d}:{:02d}'.format(mins, secs) + str(commentedCount)
+        timer = 'Restart in: {:02d}:{:02d}'.format(mins, secs)
         print(timer, end="\r")
 
         if delayTime == maxDelay: 
@@ -162,7 +162,6 @@ def start():
                     print("Commenting " + commentText + " from " + user + " to " + postID)
                     writeCommentedData(commentID)
                     comment(entitiID, commentText, accessToken)
-                    commentedCount += 1
                 else:
                     print("This comment has commented")
             else:
