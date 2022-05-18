@@ -136,12 +136,11 @@ def start():
     commentedCount = 0
     while True:
         if delayTime == 0:
-            print("Commented: " + str(commentedCount))
             delayTime = maxDelay
         else:
             delayTime -= 1
         mins, secs = divmod(delayTime, 60)
-        timer = 'Restart in: {:02d}:{:02d}'.format(mins, secs)
+        timer = 'Restart in: {:02d}:{:02d}'.format(mins, secs) + str(commentedCount)
         print(timer, end="\r")
 
         if delayTime == maxDelay: 
